@@ -1,4 +1,4 @@
-class CreateSchedule < ActiveRecord::Migration[8.0]
+class CreateSchedules < ActiveRecord::Migration[8.0]
   def change
     create_table :schedules do |t|
       t.references :class_subject, null: false, foreign_key: true

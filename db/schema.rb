@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_27_123128) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_27_125007) do
   create_table "academic_years", force: :cascade do |t|
     t.string "name", null: false
     t.date "start_date", null: false
@@ -141,9 +141,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_27_123128) do
     t.boolean "status", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "study_class_id"
     t.index ["enrollment_year"], name: "index_students_on_enrollment_year"
     t.index ["major_id"], name: "index_students_on_major_id"
     t.index ["student_code"], name: "index_students_on_student_code", unique: true
+    t.index ["study_class_id"], name: "index_students_on_study_class_id"
     t.index ["user_id"], name: "index_students_on_user_id"
   end
 
@@ -201,6 +203,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_27_123128) do
   add_foreign_key "majors", "departments"
   add_foreign_key "student_class_subjects", "class_subjects"
   add_foreign_key "student_class_subjects", "students"
+  add_foreign_key "students", "classes", column: "study_class_id"
   add_foreign_key "students", "majors"
   add_foreign_key "students", "users"
   add_foreign_key "subjects", "majors"
