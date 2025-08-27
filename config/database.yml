@@ -1,0 +1,25 @@
+# config/database.yml
+default: &default
+  adapter: sqlserver
+  encoding: utf8
+  username: <%= ENV.fetch("DB_USERNAME") { "sa" } %>
+  password: <%= ENV.fetch("DB_PASSWORD") { "12345" } %>
+  host: <%= ENV.fetch("DB_HOST") { "localhost" } %>
+  port: <%= ENV.fetch("DB_PORT") { 1433 } %>
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  timeout: 5000
+
+development:
+  <<: *default
+  database: <%= ENV.fetch("DB_NAME_DEV") { "student_management_dev" } %>
+
+test:
+  <<: *default
+  database: <%= ENV.fetch("DB_NAME_TEST") { "student_management_test" } %>
+
+production:
+  <<: *default
+  database: <%= ENV.fetch("DB_NAME_PROD") { "student_management_prod" } %>
+  host: <%= ENV.fetch("DB_HOST_PROD") { ENV.fetch("DB_HOST") { "localhost" } } %>
+  username: <%= ENV.fetch("DB_USERNAME_PROD") { ENV.fetch("DB_USERNAME") { "sa" } } %>
+  password: <%= ENV.fetch("DB_PASSWORD_PROD") { ENV.fetch("DB_PASSWORD") { "12345" } } %>
