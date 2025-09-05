@@ -10,6 +10,9 @@ class User < ApplicationRecord
   validates :role, presence: true, inclusion: { in: %w[admin teacher student] }
   validates :status, inclusion: { in: [true, false] }
   
+  # Add attribute casting
+  attribute :status, :boolean
+  
   # Scopes
   scope :active, -> { where(status: true) }
   scope :by_role, ->(role) { where(role: role) }

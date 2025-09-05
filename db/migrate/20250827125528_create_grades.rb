@@ -6,7 +6,7 @@ class CreateGrades < ActiveRecord::Migration[8.0]
       t.decimal :score, precision: 5, scale: 2, null: false
       t.text :note
       t.references :graded_by, null: false, foreign_key: { to_table: :teachers }
-      t.datetime :graded_at, default: -> { 'CURRENT_TIMESTAMP' }
+      t.datetime :graded_at, null: false, default: -> { 'CURRENT_TIMESTAMP' }
 
       t.timestamps
     end

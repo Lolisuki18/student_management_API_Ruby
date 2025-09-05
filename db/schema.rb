@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_27_125007) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_27_125546) do
   create_table "academic_years", force: :cascade do |t|
     t.string "name", null: false
     t.date "start_date", null: false
@@ -71,11 +71,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_27_125007) do
     t.datetime "updated_at", null: false
     t.index ["code"], name: "index_departments_on_code", unique: true
     t.index ["head_teacher_id"], name: "index_departments_on_head_teacher_id"
-  end
-
-  create_table "grade_types", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
   end
 
   create_table "grades", force: :cascade do |t|

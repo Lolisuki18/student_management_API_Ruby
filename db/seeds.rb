@@ -13,21 +13,7 @@ academic_year = AcademicYear.find_or_create_by!(name: "2024-2025") do |ay|
   ay.status = true
 end
 
-# 2. Tạo Grade Types (skip tạm thời do migration chưa hoàn thiện)
-puts "📊 Bỏ qua tạo loại điểm (sẽ tạo sau)..."
 
-# grade_types = [
-#   { name: "Chuyên cần", weight: 10.0, description: "Điểm chuyên cần, tham gia lớp học" },
-#   { name: "Bài tập", weight: 20.0, description: "Điểm bài tập về nhà và trên lớp" },
-#   { name: "Giữa kỳ", weight: 30.0, description: "Điểm kiểm tra giữa kỳ" },
-#   { name: "Cuối kỳ", weight: 40.0, description: "Điểm thi cuối kỳ" }
-# ]
-
-# grade_types.each do |gt_attrs|
-#   GradeType.find_or_create_by!(name: gt_attrs[:name]) do |gt|
-#     gt.description = gt_attrs[:description]
-#   end
-# end
 
 # 3. Tạo Departments
 puts "🏢 Tạo khoa/bộ môn..."
@@ -267,6 +253,99 @@ class_subjects_data.each do |cs_attrs|
   end
   class_subjects[cs_attrs[:class_code]] = class_subject
 end
+# 2. Tạo Grade Types 
+puts "📊 Tạo loại điểm..."
+grade_types_data = [
+  { name: "Chuyên cần", code: "CC", weight: 10.0, description: "Điểm chuyên cần, tham gia lớp học" },
+  { name: "Bài tập", code: "BT", weight: 20.0, description: "Điểm bài tập về nhà và trên lớp" },
+  { name: "Giữa kỳ", code: "GK", weight: 30.0, description: "Điểm kiểm tra giữa kỳ" },
+  { name: "Cuối kỳ", code: "CK", weight: 40.0, description: "Điểm thi cuối kỳ" }
+]
+
+grade_types = {}
+grade_types_data.each do |gt_attrs|
+  grade_type = GradeType.find_or_create_by!(code: gt_attrs[:code]) do |gt|
+    gt.name = gt_attrs[:name]
+    gt.weight = gt_attrs[:weight]
+    gt.description = gt_attrs[:description]
+    gt.status = true
+  end
+  grade_types[gt_attrs[:name]] = grade_type
+end
+
+# 11. Đăng ký sinh viên vào lớp học phần (Student Class Subjects)
+puts "📝 Đăng ký sinh viên vào lớp học phần..."
+student_class_subjects = []
+
+# Đăng ký một số sinh viên vào các lớp học phần
+students.values.first(10).each do |student|
+  # Đăng ký vào lớp WEB101_01 (sinh viên CNTT)
+  if student.major.code == "CNTT"
+    scs1 = StudentClassSubject.find_or_create_by!(
+      student: student,
+      class_subject: class_subjects["WEB101_01"]
+    ) do |scs|
+      scs.enrollment_date = Date.current - rand(30..60).days
+      scs.status = true
+    end
+    student_class_subjects << scs1
+
+    # Đăng ký vào lớp DB101_01
+    scs2 = StudentClassSubject.find_or_create_by!(
+      student: student,
+      class_subject: class_subjects["DB101_01"]
+    ) do |scs|
+      scs.enrollment_date = Date.current - rand(30..60).days
+      scs.status = true
+    end
+    student_class_subjects << scs2
+  end
+  
+  # Đăng ký sinh viên QTKD vào lớp MGT101_01
+  if student.major.code == "QTKD"
+    scs3 = StudentClassSubject.find_or_create_by!(
+      student: student,
+      class_subject: class_subjects["MGT101_01"]
+    ) do |scs|
+      scs.enrollment_date = Date.current - rand(30..60).days
+      scs.status = true
+    end
+    student_class_subjects << scs3
+  end
+end
+
+# 12. Tạo điểm cho sinh viên (Grades)
+puts "📊 Tạo điểm cho sinh viên..."
+grades_created = 0
+
+student_class_subjects.each do |scs|
+  # Tạo điểm cho từng loại điểm
+  grade_types.values.each do |grade_type|
+    score = case grade_type.code
+    when "CC" # Chuyên cần
+      rand(8.0..10.0).round(1)
+    when "BT" # Bài tập  
+      rand(6.0..9.5).round(1)
+    when "GK" # Giữa kỳ
+      rand(5.0..9.0).round(1)
+    when "CK" # Cuối kỳ
+      rand(4.0..9.5).round(1)
+    else
+      rand(5.0..9.0).round(1)
+    end
+
+    grade = Grade.find_or_create_by!(
+      student_class_subject: scs,
+      grade_type: grade_type
+    ) do |g|
+      g.score = score
+      g.graded_by = scs.class_subject.teacher
+      g.graded_at = Date.current - rand(1..30).days
+      g.note = "Điểm #{grade_type.name.downcase}"
+    end
+    grades_created += 1 if grade.persisted?
+  end
+end
 
 puts "✅ Hoàn thành tạo dữ liệu mẫu!"
 puts "📊 Thống kê:"
@@ -280,6 +359,8 @@ puts "   - Lớp sinh hoạt: #{StudyClass.count}"
 puts "   - Phòng học: #{Room.count}"
 puts "   - Môn học: #{Subject.count}"
 puts "   - Lớp học phần: #{ClassSubject.count}"
+puts "   - Đăng ký lớp học phần: #{StudentClassSubject.count}"
+puts "   - Điểm: #{Grade.count}"
 puts ""
 puts "🔑 Tài khoản mẫu:"
 puts "   Admin: admin@university.edu.vn / 123456"

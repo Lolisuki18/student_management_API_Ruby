@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   before_action :authorize_admin, except: [:show]
-  before_action :set_user, only: [:show, :update, :destroy]  # ← Sửa: "befor_action" → "before_action"
+  before_action :set_user, only: [:show, :update, :destroy]  
 
   # GET /users
   def index

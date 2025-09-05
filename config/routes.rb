@@ -10,8 +10,25 @@ Rails.application.routes.draw do
   delete 'auth/logout', to: 'auth#logout'
   get 'auth/me', to: 'auth#me'
 
-  #User Router
+
+  # User Router
   resources :users, except: [:new, :edit]
+
+  # ================== STUDENT ROUTES ==================
+  
+  # Custom routes (đặt TRƯỚC resources để có độ ưu tiên cao hơn)
+  get 'student/dashboard/:id', to: 'student#student_dashboard', as: 'student_dashboard'
+  get 'student/search', to: 'student#search'
+  get 'student/statistics', to: 'student#statistics'
+  
+  # RESTful resources
+  resources :student, except: [:new, :edit] do
+    member do
+      # Routes cần :id - /student/:id/action  
+      patch :restore    # PATCH /student/:id/restore (khôi phục soft delete)
+    end
+  end
+
 end
 
 #Cách mà ruby tìm được controller tương ứng là 
