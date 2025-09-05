@@ -73,9 +73,31 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_27_125546) do
     t.index ["head_teacher_id"], name: "index_departments_on_head_teacher_id"
   end
 
-  create_table "grades", force: :cascade do |t|
+  create_table "grade_types", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "code", null: false
+    t.decimal "weight", precision: 5, scale: 2, null: false
+    t.text "description"
+    t.boolean "status", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_grade_types_on_code", unique: true
+    t.index ["name"], name: "index_grade_types_on_name"
+  end
+
+  create_table "grades", force: :cascade do |t|
+    t.bigint "student_class_subject_id", null: false
+    t.bigint "grade_type_id", null: false
+    t.decimal "score", precision: 5, scale: 2, null: false
+    t.text "note"
+    t.bigint "graded_by_id", null: false
+    t.datetime "graded_at", default: -> { "getdate()" }, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["grade_type_id"], name: "index_grades_on_grade_type_id"
+    t.index ["graded_by_id"], name: "index_grades_on_graded_by_id"
+    t.index ["student_class_subject_id", "grade_type_id"], name: "idx_student_grade_type_unique", unique: true
+    t.index ["student_class_subject_id"], name: "index_grades_on_student_class_subject_id"
   end
 
   create_table "majors", force: :cascade do |t|
@@ -195,6 +217,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_27_125546) do
   add_foreign_key "class_subjects", "teachers"
   add_foreign_key "classes", "majors"
   add_foreign_key "classes", "teachers", column: "homeroom_teacher_id"
+  add_foreign_key "grades", "grade_types"
+  add_foreign_key "grades", "student_class_subjects"
+  add_foreign_key "grades", "teachers", column: "graded_by_id"
   add_foreign_key "majors", "departments"
   add_foreign_key "student_class_subjects", "class_subjects"
   add_foreign_key "student_class_subjects", "students"

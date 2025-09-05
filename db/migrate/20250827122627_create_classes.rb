@@ -1,6 +1,6 @@
 class CreateClasses < ActiveRecord::Migration[8.0]
   def change
-    create_table :classes do |t|
+    create_table :study_classes do |t|
       t.string :name, null: false
       t.string :code, null: false
       t.references :major, null: false, foreign_key: true
@@ -14,7 +14,7 @@ class CreateClasses < ActiveRecord::Migration[8.0]
       t.timestamps
     end
     
-    add_index :classes, :code, unique: true
-    add_index :classes, [:academic_year, :semester]
+    add_index :study_classes, :code, unique: true
+    add_index :study_classes, [:academic_year, :semester]
   end
 end
